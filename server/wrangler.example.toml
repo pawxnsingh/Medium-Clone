@@ -1,0 +1,25 @@
+name = "quillfirebackend"
+compatibility_date = "2023-12-01"
+
+# the env variable that are required in index.ts will be took from here
+
+[vars]
+DATABASE_URL="prisma://accelerate.prisma-data.net/?api_key=youAPIkeyHere"
+
+JWT_SECRET="secretpassword"
+
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
+
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "my-database"
+# database_id = ""
+
+# [ai]
+# binding = "AI"

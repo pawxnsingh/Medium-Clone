@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  directUrl = env("DIRECT_URL")
+  url       = env("DATABASE_URL")
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  name           String?   @db.VarChar(50)
+  email          String    @unique
+  username       String?   @unique
+  password       String
+  profilePicture String    @default("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png")
+  article        Article[]
+  // here i also have to add the post i liked/clap and comment i putted
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  Comment        Comment[]
+  clap           Clap[]
+}
+
+// article can have multiple comment, tags and claps
+model Article {
+  id         Int          @id @default(autoincrement())
+  title      String
+  content    String?
+  authorId   Int
+  author     User         @relation(fields: [authorId], references: [id])
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  comment    Comment[]
+  clap       Clap[]
+  ArticleTag ArticleTag[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  articleId Int
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  Article   Article  @relation(fields: [articleId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Clap {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  articleId Int
+  User      User     @relation(fields: [userId], references: [id])
+  Article   Article  @relation(fields: [articleId], references: [id])
+  count     Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([articleId, userId]) // such that only one user can clap one article
+}
+
+// @@unique([]) is used to define a compound unique constraint
+//  This constraint ensures that the combination of the specified fields within the brackets is unique across all records in the table. It prevents duplicate combinations of the specified fields.
+
+model Tag {
+  id         Int          @id @default(autoincrement())
+  tag        String       @unique
+  ArticleTag ArticleTag[]
+}
+
+model ArticleTag {
+  articleId Int
+  tagId     Int
+  article   Article @relation(fields: [articleId], references: [id])
+  tag       Tag     @relation(fields: [tagId], references: [id])
+
+  // combination of both articleId and tagId is going to store here
+  // same and dulicate arent allowed
+  @@id([articleId, tagId])
+}
+
+// It means that each articleId can be associated with multiple tagIds, and each tagId can be associated with multiple articleIds, but each specific combination of articleId and tagId can appear only once in the table.
