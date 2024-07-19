@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client/edge";
-import { faker } from "@faker-js/faker";
+import { da, faker } from "@faker-js/faker";
 const prisma = new PrismaClient();
 
 async function seedUser() {
@@ -155,16 +155,31 @@ async function seedArticleTags() {
   }
 }
 
+async function seedSubtitle() {
+  for (let i = 1; i < 100; i++) {
+    const res = await prisma.article.updateMany({
+      where: {
+        id: i,
+      },
+      data: {
+        subtitle: faker.lorem.sentence(9),
+      },
+    });
+  }
+}
+
 async function seedDatabase() {
   try {
-    await seedUser();
-    await seedArticle();
+    // await seedUser();
+    // await seedArticle();
 
-    await seedComment();
-    await seedClap();
+    // await seedComment();
+    // await seedClap();
 
-    await seedTags();
-    await seedArticleTags();
+    // await seedTags();
+    // await seedArticleTags();
+
+    await seedSubtitle();
     console.log("Seed data created successfully!");
   } catch (error) {
     console.error("Error seeding database:", error);

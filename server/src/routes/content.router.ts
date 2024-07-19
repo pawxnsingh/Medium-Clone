@@ -270,12 +270,17 @@ app.get("/articles", async (c) => {
         id: true,
         authorId: true,
         title: true,
+        subtitle: true,
         content: true,
         createdAt: true,
+        articleImage: true,
+        clap: true,
+        comment: true,
         author: {
           select: {
             name: true,
             username: true,
+            profilePicture: true,
           },
         },
       },

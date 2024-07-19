@@ -59,6 +59,11 @@ app.post("/signin", async (c: Context) => {
     c.status(200);
     return c.json({
       msg: "user signs successfully",
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      username: user.username,
+      profilePicture: user.profilePicture,
       token: jwt,
     });
   } catch (error) {
@@ -122,6 +127,11 @@ app.post("/signup", async (c: Context) => {
     return c.json({
       msg: "signed up successfully",
       token: token,
+      id: createUser.id,
+      name: createUser.name,
+      email: createUser.email,
+      username: createUser.username,
+      profilePicture: createUser.profilePicture,
     });
   } catch (error) {
     console.log(error);

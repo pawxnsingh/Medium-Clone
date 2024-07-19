@@ -31,16 +31,18 @@ model User {
 
 // article can have multiple comment, tags and claps
 model Article {
-  id         Int          @id @default(autoincrement())
-  title      String
-  content    String?
-  authorId   Int
-  author     User         @relation(fields: [authorId], references: [id])
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  comment    Comment[]
-  clap       Clap[]
-  ArticleTag ArticleTag[]
+  id           Int          @id @default(autoincrement())
+  title        String
+  subtitle     String?
+  content      String?
+  articleImage String[]
+  authorId     Int
+  author       User         @relation(fields: [authorId], references: [id])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  comment      Comment[]
+  clap         Clap[]
+  ArticleTag   ArticleTag[]
 }
 
 model Comment {
