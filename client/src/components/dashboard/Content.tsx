@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Carousel from "./Carousel";
 import Blogcard from "./Blogcard";
-import { Skeleton } from "../ui/skeleton";
 import Blogskeleton from "./Blogskeleton";
 
 const DashboardContent = () => {
@@ -30,7 +29,9 @@ const DashboardContent = () => {
       <Carousel />
       <div>
         {loading &&
-          Array.from({ length: 18 }, (_, index) => <Blogskeleton key={index} />)}
+          Array.from({ length: 18 }, (_, index) => (
+            <Blogskeleton key={index} />
+          ))}
 
         {/* {blogs.map((item) => ( */}
         {/* <Blogcard /> */}

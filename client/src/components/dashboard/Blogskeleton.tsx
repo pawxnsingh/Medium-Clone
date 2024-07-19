@@ -7,10 +7,10 @@ const Blogskeleton = () => {
 
       <div className="flex justify-between items-start ">
         <div className="space-y-2 mt-6">
-          <Skeleton className="h-14 md:w-[30rem] w-[15rem]" />
+          <Skeleton className="h-14 md:w-[27rem] w-[15rem]" />
           <Skeleton className="h-4 w-[13rem]" />
         </div>
-        <div className="ml-12">
+        <div className="">
           <Skeleton className="w-[10rem] h-[7rem]" />
         </div>
       </div>
