@@ -1,9 +1,6 @@
+import z from "zod";
 import { Context, Hono, Next } from "hono";
-import {
-  blogPostZod,
-  blogUpdateZod,
-  commentPostZod,
-} from "@pawxnsingh/quillfire-common";
+
 import { verify } from "hono/jwt";
 import { getPrisma } from "../db/prismaFunction";
 
@@ -60,6 +57,14 @@ app.use(async (c: Context, next: Next) => {
 //   title
 //   content
 // }
+
+const blogPostZod = z.object({
+  authorId: z.number().optional(),
+  title: z.string().optional(),
+  subtitle: z.string().optional(),
+  content: z.string().optional(),
+});
+
 app.post("/article", async (c: Context) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
 
@@ -91,6 +96,7 @@ app.post("/article", async (c: Context) => {
     c.status(200);
     return c.json({
       id: createBlog.id,
+      title: createBlog.title,
       msg: "your blog is published now",
     });
   } catch (error) {
@@ -111,6 +117,15 @@ app.post("/article", async (c: Context) => {
 //   "title": "This is my first Article",
 //   "content": "this is some changes made by pawan singh dogra"
 // }
+const blogUpdateZod = z.object({
+  id: z.number(),
+  authorId: z.number(),
+  articleImage: z.array(z.string()).optional(),
+  title: z.string().optional(),
+  subtitle: z.string().optional(),
+  content: z.string().optional(),
+});
+
 app.put("/article/:articleId", async (c: Context) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
   try {
@@ -152,7 +167,9 @@ app.put("/article/:articleId", async (c: Context) => {
       },
       data: {
         title: body.title,
+        subtitle: body.subtitle,
         content: body.content,
+        articleImage: body.articleImage,
       },
     });
 
@@ -166,6 +183,37 @@ app.put("/article/:articleId", async (c: Context) => {
     c.status(500);
     return c.json({
       msg: "something is up with us",
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+});
+
+// get all authors article
+app.get("/userarticle", async (c: Context) => {
+  const prisma = getPrisma(c.env.DATABASE_URL);
+  try {
+    // get the authorId from the Context
+    const authorId: number = c.get("authorId");
+    const getAllUserArticle = await prisma.article.findMany({
+      where: {
+        authorId: authorId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    c.status(200);
+    return c.json({
+      getAllUserArticle,
+      msg: "your all article",
+    });
+  } catch (error) {
+    console.log(error);
+    c.status(500);
+    c.json({
+      msg: "we something up from our side",
     });
   } finally {
     await prisma.$disconnect();
@@ -235,12 +283,17 @@ app.get("/article/:articleId", async (c: Context) => {
         id: true,
         title: true,
         content: true,
-        createdAt: true,
-        updatedAt: true,
+        articleImage: true,
+        isPublished: true,
+        subtitle: true,
+        clap: true,
+        comment: true,
         author: {
           select: {
             name: true,
             username: true,
+            profilePicture: true,
+            email: true,
           },
         },
       },
@@ -432,6 +485,14 @@ app.delete("/removeClap", async (c: Context) => {
 // {
 //    this is the body for posting the comment
 // }
+
+const commentPostZod = z.object({
+  id: z.number(),
+  content: z.string(),
+  articleId: z.number(),
+  userId: z.number(),
+});
+
 app.post("/comment", async (c: Context) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
 

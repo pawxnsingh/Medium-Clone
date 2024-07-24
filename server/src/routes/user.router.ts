@@ -1,14 +1,85 @@
-import { Context, Hono } from "hono";
+import { Context, Hono, Next } from "hono";
 import { signinZod, signupZod } from "@pawxnsingh/quillfire-common";
 import { getPrisma } from "../db/prismaFunction";
-import { sign } from "hono/jwt";
+import { sign, verify } from "hono/jwt";
 
 const app = new Hono<{
   Bindings: {
     DATABASE_URL: string;
     JWT_SECRET: string;
   };
+  Variables: {
+    authorId: string;
+  };
 }>();
+
+async function authMiddlewave(c: Context, next: Next) {
+  try {
+    const header: string = c.req.header("authorization")!;
+    console.log("authMiddleware", header);
+
+    if (!header) {
+      c.status(401);
+      return c.json({
+        msg: "Token is not there",
+      });
+    }
+    const token: string = header.split(" ")[1];
+    const isVerified = await verify(token, c.env?.JWT_SECRET);
+    console.log("authMiddleware", isVerified);
+
+    if (!isVerified) {
+      c.status(401);
+      return c.json({
+        msg: "Token is not valid",
+      });
+    }
+    // add a payload id to the context
+    c.set("authorId", isVerified.id);
+
+    const authorid = c.get("authorId");
+    console.log("authMiddleware", authorid);
+
+    await next();
+  } catch (error) {
+    console.log(error);
+    c.status(500);
+    return c.json({
+      msg: "we fcked up! something up from our side",
+    });
+  }
+}
+
+app.get("/getuser", authMiddlewave, async (c: Context) => {
+  const prisma = getPrisma(c.env.DATABASE_URL);
+
+  try {
+    const authorId = c.get("authorId");
+    console.log("authMiddleware", authorId);
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: authorId,
+      },
+    });
+
+    c.status(200);
+    return c.json({
+      msg: "success",
+      id: user?.id,
+      name: user?.name,
+      email: user?.email,
+      username: user?.username,
+      profilePicture: user?.profilePicture,
+    });
+    
+  } catch (error) {
+    console.log(error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
+});
 
 // -- Working
 // here c stands for context

@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Carousel from "./Carousel";
 import Blogcard from "./Blogcard";
-import Blogskeleton from "./Blogskeleton";
+import Blogskeleton from "../skeleton/Blogskeleton";
+import { Link } from "react-router-dom";
 
 const DashboardContent = () => {
   const [blog, setBlogs] = useState([]);
@@ -22,6 +23,7 @@ const DashboardContent = () => {
       setLoading(false);
     }
     getBlogs();
+    console.log(blog);
   }, []);
 
   return (
@@ -33,9 +35,11 @@ const DashboardContent = () => {
             <Blogskeleton key={index} />
           ))}
 
-        {/* {blogs.map((item) => ( */}
-        {/* <Blogcard /> */}
-        {/* ))} */}
+        {blog.map((item: any) => (
+          <Link key={item.id} to={`/${item.author.username}/${item.id}`}>
+            <Blogcard item={item} />
+          </Link>
+        ))}
       </div>
     </div>
   );

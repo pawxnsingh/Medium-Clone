@@ -32,10 +32,11 @@ model User {
 // article can have multiple comment, tags and claps
 model Article {
   id           Int          @id @default(autoincrement())
-  title        String
+  title        String?
   subtitle     String?
   content      String?
-  articleImage String[]
+  articleImage String[]     @default([])
+  isPublished  Boolean      @default(false)
   authorId     Int
   author       User         @relation(fields: [authorId], references: [id])
   createdAt    DateTime     @default(now())

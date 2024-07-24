@@ -6,7 +6,7 @@ import { cn } from "../lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
-import { userAtom } from "../recoil/atoms/user";
+import { userAtom } from "../recoil/atoms/userAtom";
 
 function SigninCard() {
   const [email, setEmail] = useState("");

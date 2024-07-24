@@ -2,32 +2,14 @@ import { Link } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
 import { TfiWrite } from "react-icons/tfi";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import { useRecoilValue } from "recoil";
-import { userAtom } from "../../recoil/atoms/user";
 
-import profile from "../../assets/profile.svg";
-import premiumstar from "../../assets/premiumstar.svg";
-import library from "../../assets/library.svg";
-import stats from "../../assets/stats.svg";
-import stories from "../../assets/stories.svg";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./dropdown-menu";
+import AvatarDropdown from "./AvatarDropdown";
 
 const Headerdashboard = () => {
-  // @ts-ignore
-  const { profilePicture, email } = useRecoilValue(userAtom);
   return (
-    <div className=" z-50 top-0 left-0 w-full bg-white">
+    <div className="z-50 top-0 left-0 w-full bg-white ">
       {/* this is the top half of header */}
-      <div className="flex relative items-center justify-between py-4 mx-5 md:mx- md:py-2">
+      <div className="flex relative items-center justify-between py-4 mx-5 md:mx- md:py-2 border-b">
         {/* this is header and search bar */}
         <div className="flex items-center gap-4">
           <div>
@@ -66,92 +48,7 @@ const Headerdashboard = () => {
             </div>
           </Link>
           {/* this is the navigation of avatar */}
-          <div className="rounded-full w-[2.1rem] border ml-3">
-            {/* <img
-              className="rounded-full"
-              src="https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/965.jpg"
-              alt="avatar"
-            /> */}
-
-            {/* <img
-              className="rounded-full"
-              src={`${profilePicture}`}
-              alt="avatar"
-            /> */}
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <img
-                  className="rounded-full"
-                  src="https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/965.jpg"
-                  alt="avatar"
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[15rem] font-notosans overflow-x-hidden overflow-visible">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem className="flex items-center">
-                    <div className="mr-3">
-                      <img width={20} src={profile} alt="profile" />
-                    </div>
-                    <div>Profile</div>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem className="flex items-center">
-                    <div className="mr-3">
-                      <img width={20} src={library} alt="profile" />
-                    </div>
-                    Library
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem className="flex items-center">
-                    <div className="mr-3">
-                      <img width={20} src={stories} alt="profile" />
-                    </div>
-                    Stories
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem>
-                    <div className="mr-3">
-                      <img width={20} src={stats} alt="sdfsdfs" />
-                    </div>
-                    Stats
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>Setting</DropdownMenuItem>
-                  <DropdownMenuItem>Refine recommendation</DropdownMenuItem>
-                  <DropdownMenuItem>Manage publication</DropdownMenuItem>
-                  <DropdownMenuItem>help</DropdownMenuItem>
-                </DropdownMenuGroup>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem className="flex justify-between">
-                  Became a Quillfire Member
-                  <img src={premiumstar} width={20} alt="premiumstar" />
-                </DropdownMenuItem>
-
-                <DropdownMenuItem>Create a Mastodon account</DropdownMenuItem>
-                <DropdownMenuItem disabled>
-                  Apply for author verifcation
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem className="flex flex-col gap-1">
-                  <div>Log out</div>
-                  <div className="text-slate-600">{"pawansingh@gmail.com"}</div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {/* <img src={`${profilePicture}`} alt="" /> */}
-          </div>
+          <AvatarDropdown />
         </nav>
       </div>
 

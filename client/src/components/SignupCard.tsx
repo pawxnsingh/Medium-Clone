@@ -6,7 +6,7 @@ import { Input } from "./ui/Input";
 import { cn } from "../lib/utils";
 import { useNavigate } from "react-router-dom";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
-import { userAtom } from "../recoil/atoms/user";
+import { userAtom } from "../recoil/atoms/userAtom";
 
 function SignupCard() {
   const [firstname, setFirstname] = useState<string>("");
@@ -38,9 +38,6 @@ function SignupCard() {
         username: res.data.username,
         profilePicture: res.data.profilePicture,
       });
-      console.log("Form submitted");
-      console.log(res);
-
       navigate("/");
     } catch (error) {
       console.log(error);

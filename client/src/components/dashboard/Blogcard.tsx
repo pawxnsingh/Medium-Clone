@@ -4,24 +4,23 @@ import { RiMessage3Fill } from "react-icons/ri";
 import { MdOutlineDoNotDisturbOn } from "react-icons/md";
 import { FaRegBookmark } from "react-icons/fa";
 import { BsThreeDots } from "react-icons/bs";
+import { dateformat } from "../../lib/dateformat";
 
-const Blogcard = ({}) => {
-  const profileImage =
-    "https://miro.medium.com/v2/resize:fill:176:176/1*ZrjAV0zdZA-Lr18PbE2UgA.jpeg";
-  const author = "Meng Li";
-  const title = "Top 15 Python Tips to Solve Your Data Analysis Challenges";
-  const subTitle = "Master Data Analysis with These Proven Python Methods";
-  const noOfLike = 7;
-  const date = "Apr 11";
-  const commentcount = 16;
-  const blogPicture =
-    "https://loremflickr.com/cache/resized/65535_53147719513_c2c4e5623e_c_640_480_nofilter.jpg";
+const Blogcard = ({ item }: any) => {
+  const profilePicture = item.author.profilePicture;
+  const author = item.author.name;
+  const title = item.title;
+  const subTitle = item.subtitle;
+  const noOfLike = item.clap.length;
+  const date = dateformat(item.createdAt);
+  const commentcount = item.comment.length;
+  const blogPicture = item.articleImage[0];
 
   return (
     <div className="flex flex-col border-b font-notosans mt-7">
       <Link to={`/username`} className="flex py-2 items-center gap-2 mb-1">
         <img
-          src={profileImage}
+          src={profilePicture}
           width={20}
           alt="profileImage"
           className="rounded-full"

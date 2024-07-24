@@ -8,7 +8,7 @@ import premiumstar from "../../assets/premiumstar.svg";
 
 const Sidepanel = () => {
   return (
-    <div className="hidden lg:block max-w-[368px] border-l border-gray-200 px-10 py-3.5 font-notosans  top-0">
+    <div className="hidden lg:sticky lg:top-0 bottom-0 lg:block max-w-[368px] border-l border-gray-200 px-10 py-3.5 font-notosans">
       {/* staff pick section */}
       <h1 className="font-bold mb-5">Staff Picks</h1>
       <div className="">
