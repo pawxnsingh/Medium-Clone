@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { BsLayoutSidebarInset } from "react-icons/bs";
@@ -12,6 +12,8 @@ import {
   AccordionTrigger,
 } from "../ui/accordion";
 import axios from "axios";
+import { useRecoilValue } from "recoil";
+import { userAtom } from "../../recoil/atoms/userAtom";
 
 type articleType = {
   id: Number;
@@ -25,60 +27,71 @@ type articleType = {
   updatedAt: Date;
 }[];
 
-const DraftSidebar = ({
-  selectedDraftorPublishedArticle,
-  setSelectedDraftorPublishedArticle,
-}: {
-  selectedDraftorPublishedArticle: Number | undefined;
-  setSelectedDraftorPublishedArticle: React.Dispatch<
-    React.SetStateAction<Number | undefined>
-  >;
-}) => {
+const DraftSidebar = () => {
+  // this one is for to toggle the draft sidebar
   const [open, setOpen] = useState<Boolean>(false);
-  const [article, setArticle] = useState<articleType | undefined>();
-  // this is used to make the useEffect rerendered for new draft
+  // this below state variable is for highlighting the draft or published article tell which one is selected
+  const [selectedDraftorPublishedArticle, setSelectedDraftorPublishedArticle] =
+    useState<Number>();
+
+  const { id } = useRecoilValue(userAtom);
+
+  // when data is fetched, article will store all the article
+  const [article, setArticle] = useState<articleType>();
+
+  //  this is used to make the useEffect rerendered for new draft
   const [update, setUpdated] = useState(1);
   const navigate = useNavigate();
+
   useEffect(() => {
     async function Article() {
-      const articleObj = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/content/userarticle`,
+      try {
+        const articleObj = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/content/userarticle/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        const articles = articleObj.data.getAllUserArticle;
+        setArticle(articles);
+        setSelectedDraftorPublishedArticle(articles[0].id);
+        navigate(`/new-story?articleId=${articles[0].id}`);
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    }
+    Article();
+  }, [update]);
+
+  const handleNewDraft = async () => {
+    try {
+      const newDraft = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/content/article`,
+        {
+          authodId: "random",
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
-      setArticle(articleObj.data.getAllUserArticle);
+      setUpdated((c) => c + 1);
+      navigate(`/new-story?articleId=${newDraft.data.id}`);
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
-    Article();
-  }, [update]);
-
-  const handleNewDraft = async () => {
-    const newDraft = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/content/article`,
-      {
-        authodId: "random",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-    console.log(newDraft);
-    setUpdated((c) => c + 1);
-    const id = newDraft.data.id;
-    navigate(`/new-story?articleId=${id}`);
   };
-
-  console.log(selectedDraftorPublishedArticle);
 
   return (
     <div
-      className={`hidden md:inline-block min-h-screen bg-gray-50 font-notosans ${
-        open ? "w-72 border-r border-gray-200" : "w-16"
-      } px-4 text-white  duration-300`}
+      className={`hidden  md:inline-block min-h-screen bg-gray-50 font-notosans ${
+        open ? "w-72 border-r border-gray-200 shrink-0" : "w-16"
+      } px-4 text-white  duration-500`}
     >
       <div className="py-3 flex justify-end">
         {open ? (
@@ -114,7 +127,6 @@ const DraftSidebar = ({
           </div>
         </Link>
 
-        {/* here put some collapsible  */}
         <div className="w-full px-2">
           <Accordion type="single" collapsible className="text-black ">
             <AccordionItem value="item-1" className="mb-7 mt-5">
@@ -136,7 +148,7 @@ const DraftSidebar = ({
                         navigate(`/new-story?articleId=${item.id}`);
                       }}
                     >
-                      {item.title === null ? "Untitled" : item.title}
+                      {item.title == "" ? "Untitled" : item.title}
                     </AccordionContent>
                   );
                 })}
@@ -162,7 +174,7 @@ const DraftSidebar = ({
                         navigate(`/new-story?articleId=${item.id}`);
                       }}
                     >
-                      {item.title}
+                      {item.title == "" ? "Untitled" : item.title}
                     </AccordionContent>
                   );
                 })}

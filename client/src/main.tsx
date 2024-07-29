@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { RecoilRoot } from "recoil";
@@ -10,6 +10,7 @@ import SignupCard from "./components/SignupCard.tsx";
 const Newstory = lazy(() => import("./components/createArticle/Newstory.tsx"));
 import Profilepage from "./components/Profilepage.tsx";
 import ArticleDisplay from "./components/dashboard/ArticleDisplay.tsx";
+import { Toaster } from "./components/ui/toast/toaster.tsx";
 
 const appRouter = createBrowserRouter([
   {
@@ -37,13 +38,8 @@ const appRouter = createBrowserRouter([
         element: <Profilepage />,
       },
       {
-        // done
         path: "/:username/:articleId",
         element: <ArticleDisplay />,
-      },
-      {
-        path: "/explore-topic",
-        element: <div>this is explore topic route</div>,
       },
       {
         path: "/tag/:tagname",
@@ -55,8 +51,9 @@ const appRouter = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   // <React.StrictMode>
-    <RecoilRoot>
-      <RouterProvider router={appRouter} />
-    </RecoilRoot>
+  <RecoilRoot>
+    <RouterProvider router={appRouter} />
+    <Toaster />
+  </RecoilRoot>
   // </React.StrictMode>
 );

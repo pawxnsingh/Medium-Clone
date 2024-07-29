@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 
 const Dashboard = () => {
   const { username, articleId } = useParams();
-  const outletPaths = [`/${username}/${articleId}`];
+  const outletPaths = [`/${username}/${articleId}`, `/${username}`, `/error`];
   const location = useLocation();
   const isOutletPath = outletPaths.includes(location.pathname);
   return (

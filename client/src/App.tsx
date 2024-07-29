@@ -6,11 +6,11 @@ import { userAtom } from "./recoil/atoms/userAtom";
 
 const App = () => {
   const token = localStorage.getItem("token");
-  console.log(token);
   if (!token) {
-    <Landing />;
+    return <Landing />;
   }
-  const user = useRecoilValue(userAtom);
+  // const user = useRecoilValue(userAtom);
+  const user = true;
   const location = useLocation();
   const outletPaths = ["/signin", "/signup", "/new-story"];
   const isOutletPath = outletPaths.includes(location.pathname);

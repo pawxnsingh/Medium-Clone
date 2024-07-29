@@ -3,7 +3,7 @@ import { Skeleton } from "../ui/Skeleton";
 const ArticleSkeleton = () => {
   return (
     <div className="flex justify-center w-screen">
-      <div className="mt-8 w-[70rem] mx-7  md:max-w-[42.5rem]">
+      <div className="mt-8 w-[70rem] mx-7  md:max-w-[50rem]">
         <Skeleton className="w-[23rem] p-5" />
         <div className="mt-8 flex items-center">
           <Skeleton className="p-5 w-5 rounded-full" />

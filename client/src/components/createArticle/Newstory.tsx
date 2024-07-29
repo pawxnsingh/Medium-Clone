@@ -1,102 +1,78 @@
-import "@blocknote/core/fonts/inter.css";
-import { useCreateBlockNote } from "@blocknote/react";
-import { BlockNoteView } from "@blocknote/mantine";
-import "@blocknote/mantine/style.css";
+// Importing React hooks and libraries
+import { useCallback, useEffect, useRef, useState } from "react";
+import { IoMdClose } from "react-icons/io";
+import { useRecoilValue } from "recoil";
+import { useSearchParams } from "react-router-dom";
+import axios from "axios";
 
+// Importing custom components
 import Headerpublishing from "./Headerpublishing";
-import { useEffect, useRef, useState } from "react";
-
 import { CoverImage } from "./CoverImage";
 import { AspectRatio } from "../ui/aspect-ratio";
 import DraftSidebar from "./DraftSidebar";
 
-import { IoMdClose } from "react-icons/io";
-import { useRecoilValue } from "recoil";
+// Importing Recoil atom
 import { userAtom } from "../../recoil/atoms/userAtom";
-import { useSearchParams } from "react-router-dom";
 
-import axios from "axios";
+// Importing utility functions
 import { generateSignature } from "../../lib/signature";
+import BlockNoteEditor from "./BlockNoteEditor";
+import DraftSkeleton from "../skeleton/DraftSkeleton";
+import { useCreateBlockNote } from "@blocknote/react";
 
 const Newstory: React.FC = () => {
-  // this is used to instantiate the editor
   const [title, setTitle] = useState<string>("");
   const [subtitle, setSubtitle] = useState<string>("");
 
   const [coverImage, setCoverImage] = useState<string>("");
-  const [isImageSelected, setIsImageSelected] = useState<Boolean>(false);
+  const [isImageSelected, setIsImageSelected] = useState<boolean>(false);
   const [publicId, setPublicId] = useState<string>("");
 
-  const [uploading, setUploading] = useState<Boolean>(false);
-
-  const [selectedDraftorPublishedArticle, setSelectedDraftorPublishedArticle] =
-    useState<Number>();
-
-  const [initialContent, setInitialContent] = useState();
-
-  const editor = useCreateBlockNote({
-    // initialContent: JSON.parse(initialContent),
-  });
+  const [uploading, setUploading] = useState<boolean>(false);
 
   const [searchParams] = useSearchParams();
   const articleId = searchParams.get("articleId");
 
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  console.log(title);
+  console.log(subtitle);
+
   useEffect(() => {
-    async function getArticle() {
-      const article = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/content/article/${articleId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      console.log(article.data);
-
-      console.log(article.data.getBlog.title);
-
-      if (article.data.getBlog.title === null) {
-        setTitle("");
-      } else {
-        setTitle(article.data.getBlog.title);
+    try {
+      async function getArticle() {
+        const article = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/content/article/${articleId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        console.log(article.data);
+        const blog = article.data.getBlog;
+        setTitle(blog?.title || "");
+        setSubtitle(blog?.subtitle || "");
+        setCoverImage(blog?.articleImage[0] || "");
+        setIsImageSelected(blog.articleImage.length > 0);
+        setIsLoading(false);
       }
-
-      console.log(article.data.getBlog.subtitle);
-
-      if (article.data.getBlog.subtitle === null) {
-        setSubtitle("");
-      } else {
-        setSubtitle(article.data.getBlog.title);
-      }
-
-      console.log(article.data.getBlog.articleImage[0]);
-
-      if (article.data.getBlog.articleImage.length === 0) {
-        setCoverImage("");
-        setIsImageSelected(false);
-      } else {
-        setCoverImage(article.data.getBlog.articleImage[0]);
-        setIsImageSelected(true);
-      }
-
-      setInitialContent(article.data.getBlog.content);
-      console.log(article.data.getBlog.content);
+      getArticle();
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
-    getArticle();
-  }, [selectedDraftorPublishedArticle]);
+  }, [articleId]);
 
   const { id } = useRecoilValue(userAtom);
 
-  // almost done
   const publishArticle = async () => {
-    // make a backend calls
     if (!isImageSelected) {
       alert("Please upload the cover image");
       return;
     }
-
     const publish = await axios.put(
-      `${import.meta.env.VITE_BACKEND_URL}/content/article`,
+      `${import.meta.env.VITE_BACKEND_URL}/content/article/${articleId}`,
       {
         id: articleId,
         isPublished: true,
@@ -107,39 +83,53 @@ const Newstory: React.FC = () => {
         },
       }
     );
-
     console.log(publish, "article got published");
   };
 
-  // just make a post article req
-  // save all the dettail threre
-  // but just keep the isPublishtag to false
-  //! make some more optimization like debouncing ya thothling
-  const saveDraft = async () => {
-    console.log("i got saved");
-    const content = JSON.stringify(editor.document);
-    const saveDraft = await axios.put(
-      `${import.meta.env.VITE_BACKEND_URL}/content/article/${articleId}`,
-      {
-        id: Number(articleId),
-        authorId: Number(id),
-        title: title,
-        subtitle: subtitle,
-        content: content,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+  const debounceSaveDraft = useCallback(
+    (
+      fxn: (editor?: ReturnType<typeof useCreateBlockNote>) => Promise<any>,
+      delay: number
+    ) => {
+      let debounceTimer: ReturnType<typeof setTimeout>;
+      return function (this: unknown, ...args: []) {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => fxn.apply(this, args), delay);
+      };
+    },
+    []
+  );
+
+  const saveDraft = async (editor?: ReturnType<typeof useCreateBlockNote>) => {
+    try {
+      const markdown = await editor?.blocksToMarkdownLossy(editor?.document);
+      console.log("logged");
+      if (title.trim() || subtitle.trim() || markdown?.trim()) {
+        const res = await axios.put(
+          `${import.meta.env.VITE_BACKEND_URL}/content/article/${articleId}`,
+          {
+            id: Number(articleId),
+            authorId: Number(id),
+            title: title,
+            subtitle: subtitle,
+            content: markdown,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        console.log(res.data.update);
+        return res.data.update;
+      } else {
+        console.log("No content to save");
       }
-    );
-    console.log(saveDraft.data);
-    return saveDraft;
+    } catch (error) {
+      console.error("Error saving draft:", error);
+    }
   };
 
-  // i think this is benefiecial for the munual upload
-  // put it also update the coverImage stateVariable adn isImageSelecred one as well
-  // {articleid, id}
   const handleManualImageUpload = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -156,9 +146,6 @@ const Newstory: React.FC = () => {
           "https://api.Cloudinary.com/v1_1/dkwsob2vo/image/upload",
           formData
         );
-
-        const url = uploadImage.data;
-        console.log(url);
 
         const updateBackendDB = await axios.put(
           `${import.meta.env.VITE_BACKEND_URL}/content/article/${articleId}`,
@@ -183,14 +170,14 @@ const Newstory: React.FC = () => {
           "Image uploaded to Cloudinary:",
           uploadImage.data.secure_url
         );
-        console.log("Database updated successfullt", updateBackendDB.data);
+        console.log("Database updated successfully", updateBackendDB.data);
       } catch (error) {
         console.error("Error uploading image to Cloudinary:", error);
       }
     }
   };
 
-  const handleUnsplashImageUpload = async () => {
+  async function handleUnsplashImageUpload(imageUrl: string) {
     setUploading(true);
     try {
       await axios.put(
@@ -198,7 +185,7 @@ const Newstory: React.FC = () => {
         {
           id: Number(articleId),
           authorId: Number(id),
-          articleImage: [coverImage],
+          articleImage: [imageUrl],
         },
         {
           headers: {
@@ -211,7 +198,7 @@ const Newstory: React.FC = () => {
       console.log(error);
       setUploading(false);
     }
-  };
+  }
 
   const HandleDeleteImage = async () => {
     const splitedUrl: String[] | undefined = coverImage?.split("/");
@@ -249,80 +236,87 @@ const Newstory: React.FC = () => {
         },
       }
     );
-    console.log("i got deleted");
-    setCoverImage();
+    setCoverImage("");
     setIsImageSelected(false);
   };
-  console.log(coverImage);
 
   return (
     <div className="flex">
-      <DraftSidebar
-        selectedDraftorPublishedArticle={selectedDraftorPublishedArticle}
-        setSelectedDraftorPublishedArticle={setSelectedDraftorPublishedArticle}
-      />
-
-      <div className="flex-grow">
+      <DraftSidebar />
+      <div className="w-full">
         <Headerpublishing publishArticle={publishArticle} />
-        <div className="flex justify-center w-sc reen mt-6">
-          <div className="w-[67r em] md:mx-7 md:max-w-[55rem]">
-            {isImageSelected ? (
-              <AspectRatio ratio={17 / 11} className="mx-14 relative mb-10">
-                {typeof coverImage === "string" ? (
-                  <>
-                    <img
-                      src={coverImage}
-                      alt="CoverImage"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute right-5 bottom-6 p-2 rounded-2xl font-bold font-notosans backdrop-blur-3xl text-white">
-                      UNSPLASH
-                    </div>
-                  </>
-                ) : (
-                  ""
-                )}
-                <div
-                  className="absolute top-6 right-7 bg-white rounded-xl p-2"
-                  onClick={() => {
-                    setIsImageSelected(false);
-                    HandleDeleteImage();
-                  }}
-                >
-                  <IoMdClose size={30} />
-                </div>
-              </AspectRatio>
+        <div className="flex justify-center mt-6">
+          <div className="w-[67rem] md:mx-7 md:max-w-[55rem] pb-[150px]">
+            {isLoading ? (
+              <DraftSkeleton />
             ) : (
-              <CoverImage
-                handleManualImageUpload={handleManualImageUpload}
-                handleUnsplashImageUpload={handleUnsplashImageUpload}
-                setCoverImage={setCoverImage}
-                setIsImageSelected={setIsImageSelected}
-                uploading={uploading}
-              />
+              <>
+                <div>
+                  {isImageSelected ? (
+                    <AspectRatio
+                      ratio={17 / 11}
+                      className="mx-14 relative mb-10"
+                    >
+                      {typeof coverImage === "string" ? (
+                        <>
+                          <img
+                            src={coverImage}
+                            alt="CoverImage"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute right-5 bottom-6 p-2 rounded-2xl font-bold font-notosans backdrop-blur-3xl text-white">
+                            UNSPLASH
+                          </div>
+                        </>
+                      ) : (
+                        ""
+                      )}
+                      <div
+                        className="absolute top-6 right-7 bg-white rounded-xl p-2"
+                        onClick={() => {
+                          setIsImageSelected(false);
+                          HandleDeleteImage();
+                        }}
+                      >
+                        <IoMdClose size={30} />
+                      </div>
+                    </AspectRatio>
+                  ) : (
+                    <CoverImage
+                      handleManualImageUpload={handleManualImageUpload}
+                      handleUnsplashImageUpload={handleUnsplashImageUpload}
+                      setCoverImage={setCoverImage}
+                      setIsImageSelected={setIsImageSelected}
+                      uploading={uploading}
+                    /> 
+                  )}
+                  <div
+                    className="flex relative flex-col w-full px-[3.375rem]"
+                    onChange={async () =>
+                      debounceSaveDraft(await saveDraft(), 1000)
+                    }
+                  >
+                    <AutoResizeTextarea
+                      value={title}
+                      placeholder="Article Title..."
+                      onChange={(e) => setTitle(e.target.value)}
+                      maxLength={144}
+                    />
+                    <AutoResizeTextarea
+                      value={subtitle}
+                      placeholder="Article Subtitle..."
+                      onChange={(e) => setSubtitle(e.target.value)}
+                      subHeading={true}
+                      maxLength={144}
+                    />
+                  </div>
+                </div>
+              </>
             )}
-            <div
-              className="flex relative flex-col w-full px-[3.375rem]"
-              onChange={saveDraft}
-            >
-              <AutoResizeTextarea
-                value={title}
-                placeholder="Article Title..."
-                onChange={(e) => setTitle(e.target.value)}
-                maxLength={144}
-              />
-              <AutoResizeTextarea
-                value={subtitle}
-                placeholder="Article Subtitle..."
-                onChange={(e) => setSubtitle(e.target.value)}
-                subHeading={true}
-                maxLength={144}
-              />
-            </div>
-            <BlockNoteView
-              onChange={saveDraft}
-              theme={"light"}
-              editor={editor}
+            <BlockNoteEditor
+              isLoading={isLoading}
+              debounceSaveDraft={debounceSaveDraft}
+              saveDraft={saveDraft}
             />
           </div>
         </div>

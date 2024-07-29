@@ -3,14 +3,20 @@ import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import axios from "axios";
 
-const Carousel = () => {
+const Carousel = ({
+  tag,
+  setTag,
+}: {
+  tag: number;
+  setTag: React.Dispatch<React.SetStateAction<number>>;
+}) => {
   const [loading, setLoading] = useState<Boolean>(true);
-  const [tag, setTag] = useState<
+  const [allTag, setAllTag] = useState<
     {
       id: number;
       tag: string;
     }[]
-  >([]);
+  >();
 
   useEffect(() => {
     async function getTags() {
@@ -23,7 +29,8 @@ const Carousel = () => {
             },
           }
         );
-        setTag(res.data.allTag);
+        console.log(res);
+        setAllTag(res.data.allTag);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching tags:", error);
@@ -88,7 +95,14 @@ const Carousel = () => {
         <div className="overflow-x-hidden" ref={tagContainerRef}>
           <div className="flex py-1">
             {!loading && (
-              <div className="ml-11 mr-4 text-nowrap font-notosans">
+              <div
+                className={`ml-11 mr-4 text-nowrap font-notosans ${
+                  tag === 0 && "text-black font-extrabold"
+                }`}
+                onClick={() => {
+                  setTag(0);
+                }}
+              >
                 For you
               </div>
             )}
@@ -99,8 +113,16 @@ const Carousel = () => {
               ))}
 
             {!loading &&
-              tag?.map((item) => (
-                <div className="mr-4 text-nowrap font-notosans" key={item.id}>
+              allTag?.map((item) => (
+                <div
+                  className={`mr-4 text-nowrap font-notosans duration-300 ${
+                    tag === item.id && "text-black font-extrabold"
+                  }`}
+                  key={item.id}
+                  onClick={() => {
+                    setTag(item.id);
+                  }}
+                >
                   {item.tag}
                 </div>
               ))}

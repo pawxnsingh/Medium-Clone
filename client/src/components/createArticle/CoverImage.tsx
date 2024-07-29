@@ -154,7 +154,7 @@ export function CoverImage({
                             console.log("Image selected");
                             setCoverImage(image.urls.regular);
                             setIsImageSelected(true);
-                            handleUnsplashImageUpload();
+                            handleUnsplashImageUpload(image.urls.regular);
                           }}
                         />
                       ))}
