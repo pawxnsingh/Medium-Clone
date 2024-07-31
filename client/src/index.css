@@ -50,3 +50,8 @@
     transform: rotate(360deg);
   }
 }
+
+/* overridding default the padding-inline css  */
+.bn-editor {
+  padding-inline: 0; /* Adjust as needed */
+}

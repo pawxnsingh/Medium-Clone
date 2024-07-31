@@ -245,24 +245,21 @@ const Newstory: React.FC = () => {
       <DraftSidebar />
       <div className="w-full">
         <Headerpublishing publishArticle={publishArticle} />
-        <div className="flex justify-center mt-6">
-          <div className="w-[67rem] md:mx-7 md:max-w-[55rem] pb-[150px]">
+        <div className="flex justify-center mt-6 px-[1rem] md:mx-10">
+          <div className="w-[67rem] md:max-w-[55rem] pb-[150px]">
             {isLoading ? (
               <DraftSkeleton />
             ) : (
               <>
                 <div>
                   {isImageSelected ? (
-                    <AspectRatio
-                      ratio={17 / 11}
-                      className="mx-14 relative mb-10"
-                    >
+                    <AspectRatio ratio={17 / 11} className="relative mb-10">
                       {typeof coverImage === "string" ? (
                         <>
                           <img
                             src={coverImage}
                             alt="CoverImage"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover rounded-md"
                           />
                           <div className="absolute right-5 bottom-6 p-2 rounded-2xl font-bold font-notosans backdrop-blur-3xl text-white">
                             UNSPLASH
@@ -288,10 +285,10 @@ const Newstory: React.FC = () => {
                       setCoverImage={setCoverImage}
                       setIsImageSelected={setIsImageSelected}
                       uploading={uploading}
-                    /> 
+                    />
                   )}
                   <div
-                    className="flex relative flex-col w-full px-[3.375rem]"
+                    className="flex relative flex-col w-full"
                     onChange={async () =>
                       debounceSaveDraft(await saveDraft(), 1000)
                     }
@@ -313,11 +310,13 @@ const Newstory: React.FC = () => {
                 </div>
               </>
             )}
-            <BlockNoteEditor
-              isLoading={isLoading}
-              debounceSaveDraft={debounceSaveDraft}
-              saveDraft={saveDraft}
-            />
+            <div className="">
+              <BlockNoteEditor
+                isLoading={isLoading}
+                debounceSaveDraft={debounceSaveDraft}
+                saveDraft={saveDraft}
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ const Headerpublishing = ({ publishArticle }: headerPublishingType) => {
   const { toast } = useToast();
 
   return (
-    <div className="z-50 sticky ov erflow-hidden top-0 left-0 backdrop-blur-lg lg:px-20 border-b border-gray-300">
+    <div className="z-50 sticky ov erflow-hidden top-0 left-0 bg-white lg:px-20 border-b border-gray-300">
       <div className="flex relative items-center justify-between py-6 mx-5 md:mx- md:py-4 ">
         <div>
           <Link to="/">

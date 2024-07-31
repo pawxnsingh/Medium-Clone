@@ -131,9 +131,9 @@ const ArticleDisplay = () => {
       {loading ? (
         <ArticleSkeleton />
       ) : (
-        <div className="flex justify-center mt-6 mx-4 md:mx-10">
-          <div className="w-[67rem] md:mx-7 md:max-w-[55rem] pb-[150px]">
-            <div className="md:px-[3.375rem] ">
+        <div className="flex justify-center mt-6 mx-4">
+          <div className="w-[67rem] md:max-w-[55rem] pb-[150px]">
+            <div className="md:px-[3.375rem]">
               <div
                 className="flex relative flex-col w-full font-bold font-notosans text-3xl
                 md:text-5xl md:text-[3rem]"
@@ -184,7 +184,6 @@ const ArticleDisplay = () => {
                       <CommentDisplaySheet />
                     </div>
                   </div>
-                  {/*  */}
                   <div>
                     <DropdownMenu>
                       <DropdownMenuTrigger>

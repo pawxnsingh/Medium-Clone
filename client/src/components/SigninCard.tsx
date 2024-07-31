@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Label } from "./ui/Label";
 import { Input } from "./ui/Input";
@@ -14,6 +14,11 @@ function SigninCard() {
 
   const setUser = useSetRecoilState(userAtom);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) navigate("/");
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,8 +40,7 @@ function SigninCard() {
         username: res.data.username,
         profilePicture: res.data.profilePicture,
       });
-      navigate("/");
-
+      navigate("/app");
       console.log("Form submitted");
       console.log(res);
     } catch (error) {

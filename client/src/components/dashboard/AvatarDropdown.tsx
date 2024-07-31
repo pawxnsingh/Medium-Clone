@@ -20,7 +20,7 @@ import { Label } from "../ui/Label";
 
 import { useRecoilValue } from "recoil";
 import { userAtom } from "../../recoil/atoms/userAtom";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import {
   Card,
@@ -30,17 +30,19 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "../ui/toast/use-toast";
 import { formatPublishDate } from "../../lib/dateformat";
 
 const AvatarDropdown = () => {
+  // const [user, setUser] = useState<any>();
   const user = useRecoilValue(userAtom);
-  const [name, setName] = useState<string>(user.name);
-  const [username, setUsername] = useState<string>(user.username);
+  const [name, setName] = useState<string>(user?.name);
+  const [username, setUsername] = useState<string>(user?.username);
   const [currentPassword, setCurrentPassword] = useState<string>();
   const [newPassword, setNewPassword] = useState<string>();
+  const navigate = useNavigate();
 
   const handleUpdateNameUsername = async () => {
     try {
@@ -88,7 +90,7 @@ const AvatarDropdown = () => {
         <DropdownMenuTrigger asChild>
           <img
             className="rounded-full"
-            src={user.profilePicture}
+            src={user?.profilePicture}
             alt="avatar"
           />
         </DropdownMenuTrigger>
@@ -256,10 +258,11 @@ const AvatarDropdown = () => {
             className="flex flex-col gap-1"
             onClick={() => {
               localStorage.removeItem("token");
+              navigate("/signin");
             }}
           >
             <div>Log out</div>
-            <div className="text-slate-600">{user.email}</div>
+            <div className="text-slate-600">{user?.email}</div>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
