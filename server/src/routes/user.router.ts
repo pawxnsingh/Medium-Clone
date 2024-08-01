@@ -1,8 +1,8 @@
-import { Context, Hono, Next } from "hono";
+import { Context, Hono } from "hono";
 import { signinZod, signupZod } from "@pawxnsingh/quillfire-common";
 import { getPrisma } from "../db/prismaFunction";
-import { sign, verify } from "hono/jwt";
-
+import { sign } from "hono/jwt";
+import { authMiddleware } from "../middleware/auth.middleware";
 const app = new Hono<{
   Bindings: {
     DATABASE_URL: string;
@@ -13,56 +13,33 @@ const app = new Hono<{
   };
 }>();
 
-async function authMiddlewave(c: Context, next: Next) {
-  try {
-    const header: string = c.req.header("authorization")!;
-    console.log("authMiddleware", header);
-
-    if (!header) {
-      c.status(401);
-      return c.json({
-        msg: "Token is not there",
-      });
-    }
-    const token: string = header.split(" ")[1];
-    const isVerified = await verify(token, c.env?.JWT_SECRET);
-    console.log("authMiddleware", isVerified);
-
-    if (!isVerified) {
-      c.status(401);
-      return c.json({
-        msg: "Token is not valid",
-      });
-    }
-    // add a payload id to the context
-    c.set("authorId", isVerified.id);
-
-    const authorid = c.get("authorId");
-    console.log("authMiddleware", authorid);
-
-    await next();
-  } catch (error) {
-    console.log(error);
-    c.status(500);
-    return c.json({
-      msg: "we fcked up! something up from our side",
-    });
-  }
-}
-
-app.get("/getuser", authMiddlewave, async (c: Context) => {
+app.get("/profile", authMiddleware, async (c: Context) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
-
+  const queryUsername = c.req.query("username");
+  const authorId = c.get("authorId");
   try {
-    const authorId = c.get("authorId");
-    console.log("authMiddleware", authorId);
+    let user;
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: authorId,
-      },
-    });
+    if (queryUsername) {
+      console.log("Searching by username:", queryUsername);
+      user = await prisma.user.findUnique({
+        where: {
+          username: queryUsername,
+        },
+      });
+    } else {
+      console.log("Searching by authorId:", authorId);
+      user = await prisma.user.findUnique({
+        where: {
+          id: authorId,
+        },
+      });
+    }
 
+    if (!user) {
+      c.status(404);
+      return c.json({ msg: "User not found" });
+    }
     c.status(200);
     return c.json({
       msg: "success",
@@ -72,7 +49,6 @@ app.get("/getuser", authMiddlewave, async (c: Context) => {
       username: user?.username,
       profilePicture: user?.profilePicture,
     });
-    
   } catch (error) {
     console.log(error);
     throw error;
@@ -81,8 +57,6 @@ app.get("/getuser", authMiddlewave, async (c: Context) => {
   }
 });
 
-// -- Working
-// here c stands for context
 app.post("/signin", async (c: Context) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
   try {
@@ -148,7 +122,6 @@ app.post("/signin", async (c: Context) => {
   }
 });
 
-// -- working
 app.post("/signup", async (c: Context) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
   try {
@@ -215,4 +188,108 @@ app.post("/signup", async (c: Context) => {
   }
 });
 
+app.put("/update", authMiddleware, async (c: Context) => {
+  const prisma = getPrisma(c.env.DATABASE_URL);
+  const body = await c.req.json();
+  if (!body.name || !body.username) {
+    c.status(400);
+    return c.json({ msg: "Bad Request: 'name' and 'username' are required." });
+  }
+  try {
+    const authorId = c.get("authorId");
+    const getUser = await prisma.user.findUnique({
+      where: {
+        id: authorId,
+      },
+    });
+    if (!getUser) {
+      c.status(404);
+      return c.json({ msg: "User not found." });
+    }
+    if (authorId !== getUser.id) {
+      c.status(403);
+      return c.json({
+        msg: "Unauthorized access. User can only update their own details.",
+      });
+    }
+    const userUpdate = await prisma.user.update({
+      where: {
+        id: authorId,
+      },
+      data: {
+        name: body.name,
+        username: body.username,
+      },
+    });
+    c.status(200);
+    return c.json({
+      msg: "success",
+      id: userUpdate.id,
+      name: userUpdate.name,
+      username: userUpdate.username,
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    c.status(500);
+    return c.json({ msg: "Internal Server Error" });
+  } finally {
+    if (prisma) {
+      await prisma.$disconnect();
+    }
+  }
+});
+
+app.put("/passwordchange", authMiddleware, async (c: Context) => {
+  const prisma = getPrisma(c.env.DATABASE_URL);
+  const body = await c.req.json();
+  if (!body.currentPassword || !body.newPassword) {
+    c.status(400);
+    return c.json({
+      msg: "Bad Request: 'password' and 'newPassword' are required.",
+    });
+  }
+  try {
+    const authorId = c.get("authorId");
+    const getUser = await prisma.user.findUnique({
+      where: {
+        id: authorId,
+      },
+    });
+    if (!getUser) {
+      c.status(404);
+      return c.json({ msg: "User not found." });
+    }
+
+    if (body.currentPassword !== getUser.password) {
+      c.status(403);
+      return c.json({
+        msg: "Unauthorized access. User password doesm't matched.",
+      });
+    }
+
+    const userUpdate = await prisma.user.update({
+      where: {
+        id: authorId,
+      },
+      data: {
+        password: body.newPassword,
+      },
+    });
+    c.status(200);
+    return c.json({
+      msg: "success",
+      id: userUpdate.id,
+      name: userUpdate.name,
+      username: userUpdate.username,
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    c.status(500);
+    return c.json({ msg: "Internal Server Error" });
+  } finally {
+    if (prisma) {
+      await prisma.$disconnect();
+    }
+  }
+});
 export default app;
