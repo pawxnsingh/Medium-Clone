@@ -7,7 +7,7 @@ export const userAtom = atom({
     key: "userSelector",
     get: async () => {
       const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/user/getuser`,
+        `${import.meta.env.VITE_BACKEND_URL}/user/profile`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

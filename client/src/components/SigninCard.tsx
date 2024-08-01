@@ -40,7 +40,7 @@ function SigninCard() {
         username: res.data.username,
         profilePicture: res.data.profilePicture,
       });
-      navigate("/app");
+      navigate("/");
       console.log("Form submitted");
       console.log(res);
     } catch (error) {

@@ -20,23 +20,22 @@ import BlockNoteEditor from "./BlockNoteEditor";
 import DraftSkeleton from "../skeleton/DraftSkeleton";
 import { useCreateBlockNote } from "@blocknote/react";
 
-const Newstory: React.FC = () => {
+const Newstory = () => {
   const [title, setTitle] = useState<string>("");
   const [subtitle, setSubtitle] = useState<string>("");
-
   const [coverImage, setCoverImage] = useState<string>("");
+
   const [isImageSelected, setIsImageSelected] = useState<boolean>(false);
   const [publicId, setPublicId] = useState<string>("");
-
   const [uploading, setUploading] = useState<boolean>(false);
 
   const [searchParams] = useSearchParams();
   const articleId = searchParams.get("articleId");
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { id } = useRecoilValue(userAtom);
 
-  console.log(title);
-  console.log(subtitle);
+  console.log(articleId);
 
   useEffect(() => {
     try {
@@ -49,7 +48,8 @@ const Newstory: React.FC = () => {
             },
           }
         );
-        console.log(article.data);
+        console.log(article);
+
         const blog = article.data.getBlog;
         setTitle(blog?.title || "");
         setSubtitle(blog?.subtitle || "");
@@ -63,8 +63,6 @@ const Newstory: React.FC = () => {
       throw error;
     }
   }, [articleId]);
-
-  const { id } = useRecoilValue(userAtom);
 
   const publishArticle = async () => {
     if (!isImageSelected) {
@@ -120,8 +118,7 @@ const Newstory: React.FC = () => {
             },
           }
         );
-        console.log(res.data.update);
-        return res.data.update;
+        return res.data;
       } else {
         console.log("No content to save");
       }

@@ -95,7 +95,7 @@ const ArticleDisplay = () => {
 
   const handleClap = async () => {
     const postClap = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/content/addClap`,
+      `${import.meta.env.VITE_BACKEND_URL}/clap/add`,
       {
         articleId: Number(articleId),
         userId: Number(id),
@@ -111,7 +111,7 @@ const ArticleDisplay = () => {
 
   const handleRemoveClap = async () => {
     const postClap = await axios.delete(
-      `${import.meta.env.VITE_BACKEND_URL}/content/removeClap`,
+      `${import.meta.env.VITE_BACKEND_URL}/clap/remove`,
       {
         data: {
           articleId: Number(articleId),

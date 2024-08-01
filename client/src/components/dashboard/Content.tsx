@@ -26,7 +26,7 @@ const DashboardContent = () => {
         setLoading(false);
       } else {
         const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/content/tag/${tag}`,
+          `${import.meta.env.VITE_BACKEND_URL}/tag/${tag}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

@@ -21,15 +21,11 @@ const Carousel = ({
   useEffect(() => {
     async function getTags() {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/content/tags`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        console.log(res);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/tag`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         setAllTag(res.data.allTag);
         setLoading(false);
       } catch (error) {
@@ -115,7 +111,7 @@ const Carousel = ({
             {!loading &&
               allTag?.map((item) => (
                 <div
-                  className={`mr-4 text-nowrap font-notosans duration-300 ${
+                  className={`mr-4 text-nowrap font-notosans duration-300 cursor-pointer ${
                     tag === item.id && "text-black font-extrabold"
                   }`}
                   key={item.id}

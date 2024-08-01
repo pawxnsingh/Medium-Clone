@@ -34,9 +34,7 @@ export function CommentDisplaySheet() {
   useEffect(() => {
     async function getComments() {
       const commentRes = await axios.get(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/content/comment?articleId=${articleId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/comment?articleId=${articleId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -53,7 +51,7 @@ export function CommentDisplaySheet() {
   const handleCommentEntry = async () => {
     try {
       const postComment = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/content/comment`,
+        `${import.meta.env.VITE_BACKEND_URL}/comment`,
         {
           content: commentInput,
           articleId: Number(articleId),
@@ -77,9 +75,7 @@ export function CommentDisplaySheet() {
     console.log("asdasdasd");
     try {
       const deleteComment = await axios.delete(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/content/comment?commentId=${commentId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/comment?commentId=${commentId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

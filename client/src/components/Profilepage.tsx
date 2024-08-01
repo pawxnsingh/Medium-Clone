@@ -24,7 +24,9 @@ const Profilepage = () => {
     async function getUserDetails() {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/user/profile/${username}`,
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/user/profile?username=${username}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

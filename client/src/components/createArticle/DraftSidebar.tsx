@@ -47,14 +47,15 @@ const DraftSidebar = () => {
     async function Article() {
       try {
         const articleObj = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/content/userarticle/${id}`,
+          `${import.meta.env.VITE_BACKEND_URL}/content/articles?authorId=${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
         );
-        const articles = articleObj.data.getAllUserArticle;
+        console.log(articleObj);
+        const articles = articleObj.data.allBlog;
         setArticle(articles);
         setSelectedDraftorPublishedArticle(articles[0].id);
         navigate(`/new-story?articleId=${articles[0].id}`);
@@ -71,7 +72,8 @@ const DraftSidebar = () => {
       const newDraft = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/content/article`,
         {
-          authodId: "random",
+          authorId: id,
+          title: "",
         },
         {
           headers: {
@@ -79,8 +81,8 @@ const DraftSidebar = () => {
           },
         }
       );
-      setUpdated((c) => c + 1);
       navigate(`/new-story?articleId=${newDraft.data.id}`);
+      setUpdated((c) => c + 1);
     } catch (error) {
       console.log(error);
       throw error;
@@ -135,10 +137,10 @@ const DraftSidebar = () => {
               </AccordionTrigger>
               {article
                 ?.filter((item) => !item.isPublished)
-                .map((item, index) => {
+                .map((item) => {
                   return (
                     <AccordionContent
-                      key={index}
+                      key={`${item.id}`}
                       className={`border mb-1 py-2 px-3 overflow-hidden hover:bg-slate-100 truncate rounded-md ${
                         selectedDraftorPublishedArticle === item.id &&
                         "bg-slate-200 hover:bg-slate-200"
@@ -148,7 +150,7 @@ const DraftSidebar = () => {
                         navigate(`/new-story?articleId=${item.id}`);
                       }}
                     >
-                      {item.title == "" ? "Untitled" : item.title}
+                      {item.title === "" ? "Untitled" : item.title}
                     </AccordionContent>
                   );
                 })}
@@ -174,7 +176,7 @@ const DraftSidebar = () => {
                         navigate(`/new-story?articleId=${item.id}`);
                       }}
                     >
-                      {item.title == "" ? "Untitled" : item.title}
+                      {item.title === "" ? "Untitled" : item.title}
                     </AccordionContent>
                   );
                 })}
