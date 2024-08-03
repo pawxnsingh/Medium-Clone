@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, useEffect, SVGProps } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { JSX } from "react/jsx-runtime";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Button from "./Button";
@@ -18,7 +18,7 @@ const Profilepage = () => {
   const [user, setUser] = useState<userTypes>();
   const [article, setArticle] = useState<any>();
   const { username } = useParams();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     async function getUserDetails() {

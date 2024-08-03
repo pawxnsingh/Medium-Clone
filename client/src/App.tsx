@@ -5,7 +5,7 @@ import SigninCard from "./components/SigninCard.tsx";
 import SignupCard from "./components/SignupCard.tsx";
 
 // import { userAtom } from "./recoil/atoms/userAtom";
-import { useRecoilValue } from "recoil";
+// import { useRecoilValue } from "recoil";
 
 import Dashboard from "./components/dashboard/Dashboard";
 import Landing from "./components/Landing";
@@ -15,7 +15,7 @@ import LandingPageHeader from "./components/Header.tsx";
 import DashboardHeader from "./components/dashboard/Headerdashboard.tsx";
 import ErrorPage from "./components/ErrorPage.tsx";
 import Newstory from "./components/createArticle/Newstory.tsx";
-import { isAuth } from "./recoil/atoms/isAuth.ts";
+// import { isAuth } from "./recoil/atoms/isAuth.ts";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

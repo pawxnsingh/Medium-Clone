@@ -20,7 +20,7 @@ import { Label } from "../ui/Label";
 
 import { useRecoilValue } from "recoil";
 import { userAtom } from "../../recoil/atoms/userAtom";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import {
   Card,
@@ -30,7 +30,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { toast } from "../ui/toast/use-toast";
 import { formatPublishDate } from "../../lib/dateformat";
