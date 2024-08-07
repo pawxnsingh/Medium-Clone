@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, useEffect, SVGProps } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { JSX } from "react/jsx-runtime";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Button from "./Button";
@@ -101,7 +101,16 @@ const Profilepage = () => {
 
           <div className="flex flex-col pb-[150px]">
             {article?.map((item: any) => (
-              <Blogcard item={item} />
+              // <Blogcard item={item} />
+
+              <Link
+                key={item.id}
+                to={`/${
+                  item?.author?.username || item?.article?.author?.username
+                }/${item?.article?.id || item?.id}`}
+              >
+                <Blogcard item={item} />
+              </Link>
             ))}
           </div>
         </div>

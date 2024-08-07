@@ -71,7 +71,7 @@ export function CoverImage({
     <DropdownMenu>
       <DropdownMenuTrigger asChild disabled={uploading ? true : false}>
         <div
-          className={`mx-[3.375rem] flex items-center gap-2 px-3 hover:bg-gray-200 rounded-full justify-start w-[8rem] mb-3 ${
+          className={`flex items-center gap-2 px-3 hover:bg-gray-200 rounded-full justify-start w-[8rem] mb-3 ${
             uploading ? "bg-slate-200" : ""
           }`}
         >
