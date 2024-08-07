@@ -40,16 +40,14 @@ function SigninCard() {
         username: res.data.username,
         profilePicture: res.data.profilePicture,
       });
-      navigate("/");
-      console.log("Form submitted");
-      console.log(res);
+      navigate(0);
     } catch (error) {
       console.log(error);
       throw error;
     }
   };
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black font-notosans">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
         Welcome to Quillfire
       </h2>

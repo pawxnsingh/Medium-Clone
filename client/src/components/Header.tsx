@@ -4,7 +4,7 @@ import Navigation from "./Navigation";
 
 const Header = () => {
   return (
-    <div className="fixed z-50 top-0 left-0 w-full bg-[#f7f4ed]">
+    <div className="fixed z-50 top-0 left-0 w-full bg-[#f7f4ed] font-notosans">
       {/* this is the top half of header */}
       <div className="flex relative items-center justify-between py-4 mx-5 md:mx-16 md:py-5">
         {/* this is start - this is logo heading */}
@@ -23,7 +23,7 @@ const Header = () => {
         <div className="flex items-center">
           <Link
             to={"/signin"}
-            className="hidden md:block mr-6 font-semibold hover:underline"
+            className="hidden md:block mr-6 font-medium hover:underline"
           >
             Signin
           </Link>

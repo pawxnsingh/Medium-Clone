@@ -52,12 +52,12 @@ const components: { title: string; href: string; description: string }[] = [
 const Navigation = () => {
   return (
     <NavigationMenu>
-      <NavigationMenuList>
+      <NavigationMenuList className="hover:bg-[#f7f4ed]">
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="bg-inherit">
+          <NavigationMenuTrigger className="bg-[#f7f4ed] ">
             Getting started
           </NavigationMenuTrigger>
-          <NavigationMenuContent>
+          <NavigationMenuContent className="bg-[#f7f4ed]">
             <ul className="grid gap-2 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
               <li className="row-span-3">
                 <NavigationMenuLink asChild>
@@ -96,7 +96,7 @@ const Navigation = () => {
           <NavigationMenuTrigger className="bg-inherit">
             Features
           </NavigationMenuTrigger>
-          <NavigationMenuContent>
+          <NavigationMenuContent className="bg-[#f7f4ed]">
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
               {components.map((component) => (
                 <ListItem
